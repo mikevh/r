@@ -13,7 +13,7 @@ namespace r.Controllers
 
         public ActionResult Index(string code)
         {
-            var link = db.Links.SingleOrDefault();
+            var link = db.Links.SingleOrDefault(x => x.Code == code);
 
             if (null != link)
             {
