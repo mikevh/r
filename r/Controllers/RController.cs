@@ -3,18 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using r.Models;
 
 namespace r.Controllers
 {
     public class RController : Controller
     {
-        //
-        // GET: /R/
-        public ActionResult Index()
-        {
-            return RedirectPermanent("http://twitter.com");
+        private LinkContext db = new LinkContext();
 
-            //return View();
+        public ActionResult Index(string code)
+        {
+            var link = db.Links.SingleOrDefault();
+
+            if (null != link)
+            {
+                link.HitCount++;
+                db.SaveChanges();
+
+                return Redirect(link.URL);
+            }
+
+            return HttpNotFound();
         }
 	}
 }
