@@ -15,6 +15,23 @@
                 <a href="#/edit/{{l.Id}}">{{l.URL}}</a>
             </li>
         </ul>
+        <a class="btn" href="#/create">New</a>
+    </script>
+    <script type="text/ng-template" id="create">
+        <form role="form">
+            <div class="form-group">
+                <label for="Code">Code</label>
+                <input type="text" class="form-control" ng-model="n.Code" />
+            </div>
+            <div class="form-group">
+                <label for="URL">URL</label>
+                <input type="text" class="form-control" ng-model="n.URL" />
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn" ng-click="cancel()">Cancel</button>
+                <button type="button" class="btn btn-primary" ng-click="create(n)">Create</button>
+            </div>
+        </form>
     </script>
     <script type="text/ng-template" id="edit">
         <form role="form">
@@ -45,15 +62,29 @@
         $routeProvider.when('/edit/:id', {
             controller: 'edit',
             templateUrl: 'edit'
+        }).when('/create', {
+            controller: 'create',
+            templateUrl: 'create'
         }).otherwise({
             controller: 'index',
             templateUrl: 'index'
         });
     });
+    app.controller('create', function($scope, $http) {
+        $scope.cancel = function() {
+            window.location.href = '#/';
+        };
+
+        $scope.create = function(n) {
+            $http.post('/api/link', n).success(function(data) {
+                window.location.href = '#/';
+            }).error(function(data) {
+                console.log('error!');
+                console.log(data);
+            });
+        };
+    });
     app.controller('index', function ($scope, $http) {
-
-        $scope.links = [];
-
         $http.get('/api/link').success(function(data) {
             $scope.links = data;
         }).error(function(data) {
@@ -73,8 +104,7 @@
 
         $scope.delete = function(e) {
             $http.delete('/api/link/' + e.Id).success(function(data) {
-                console.log('success');
-                console.log(data);
+                window.location.href = '#/';
             }).error(function(data) {
                 console.log('error');
                 console.log(data);
