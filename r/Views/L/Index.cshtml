@@ -1,0 +1,90 @@
+﻿@{
+    ViewBag.Title = "Links";
+}
+<div ng-app="app" ng-controller="index">
+    <div class="row">
+        <div class="col-md-5">
+            <ng-view></ng-view>
+        </div>
+    </div>
+    <script type="text/ng-template" id="index">
+        <h2>Index</h2>
+        <ul class="list-group">
+            <li class="list-group-item" ng-repeat="l in links">
+                <span class="badge">{{ l.HitCount }}</span>
+                <a href="#/edit/{{l.Id}}">{{l.URL}}</a>
+            </li>
+        </ul>
+    </script>
+    <script type="text/ng-template" id="edit">
+        <form role="form">
+            <div class="form-group">
+                <label for="Code">Code</label>
+                <input type="text" id="Code" class="form-control" ng-model="e.Code" />
+            </div>
+            <div class="form-group">
+                <label for="URL">URL</label>
+                <input type="text" id="URL" class="form-control" ng-model="e.URL" />
+            </div>
+            <div class="form-group">
+                <label for="HitCount">Hit Count</label>
+                <span class="form-control-static">{{ e.HitCount }}</span>
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-primary" ng-click="update(e)">Update</button>
+                <button type="button" class="btn btn-danger" ng-click="delete(e)">Delete</button>
+            </div>
+        </form>
+    </script>
+</div>
+<script src="~/Scripts/angular.min.js"></script>
+<script src="~/Scripts/angular-route.min.js"></script>
+<script type="text/javascript">
+    var app = angular.module('app', ['ngRoute']);
+    app.config(function($routeProvider) {
+        $routeProvider.when('/edit/:id', {
+            controller: 'edit',
+            templateUrl: 'edit'
+        }).otherwise({
+            controller: 'index',
+            templateUrl: 'index'
+        });
+    });
+    app.controller('index', function ($scope, $http) {
+
+        $scope.links = [];
+
+        $http.get('/api/link').success(function(data) {
+            $scope.links = data;
+        }).error(function(data) {
+            console.log(data);
+        });
+    });
+    app.controller('edit', function ($scope, $http, $routeParams) {
+
+        $scope.update = function(e) {
+            $http.put('/api/link/' + e.Id, e).success(function(data) {
+                window.location.href = '#/';
+            }).error(function(data) {
+                console.log('error');
+                console.log(data);
+            });
+        };
+
+        $scope.delete = function(e) {
+            $http.delete('/api/link/' + e.Id).success(function(data) {
+                console.log('success');
+                console.log(data);
+            }).error(function(data) {
+                console.log('error');
+                console.log(data);
+            });
+        };
+
+        $http.get('/api/link/' + $routeParams.id).success(function(data) {
+            $scope.e = data;
+        }).error(function(data) {
+            console.log(data);
+        });
+    });
+</script>
